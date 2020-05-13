@@ -16,7 +16,7 @@ typedef enum
 {
     Init,
     Run,
-    Reset
+    Phase_Swap
 } timer_state;
 
 // forward declarations to avoid include cycle

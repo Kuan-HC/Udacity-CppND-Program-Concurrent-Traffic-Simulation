@@ -78,14 +78,14 @@ void TrafficLight::cycleThroughPhases()
             if (std::chrono::duration_cast<std::chrono::milliseconds>(now - last).count() > time_threshold)
             {
                 /* std::cout << "loop take " << std::chrono::duration_cast<std::chrono::milliseconds>(now - last).count() << "ms -> toggle" << std::endl; */ /* for debug */
-                _currentPhase = _currentPhase ? red : green;
-                state = Reset;
-            }
+                state = Phase_Swap;
+            }            
             break;
-        case Reset:
+        case Phase_Swap:
             /* std::cout << "Reset " << std::endl; */ /* for debug */
+            _currentPhase = _currentPhase ? red : green;
             time_threshold = cycle_duration(gen);
-            last = now;
+            last = now;            
             state = Run;
             break;
         }
