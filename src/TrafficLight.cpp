@@ -97,7 +97,11 @@ void TrafficLight::cycleThroughPhases()
             }            
             break;
         case Phase_Swap:
-            /* std::cout << "Reset " << std::endl; */ /* for debug */
+        /*
+            std::unique_lock<std::mutex> uLock(_mutex);
+            std::cout << "Traffic Light Switch - Thread: " << std::this_thread::get_id() << std::endl; 
+            uLock.unlock();
+        */ /* for debug */
             _currentPhase = _currentPhase ? red : green;
             time_threshold = cycle_duration(gen);
             last = now;  
