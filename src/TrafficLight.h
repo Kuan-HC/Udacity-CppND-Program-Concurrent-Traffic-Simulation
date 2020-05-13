@@ -31,8 +31,8 @@ template <class T>
 class MessageQueue
 {
 public:
-    T MessageQueue<T>::receive();
-    void MessageQueue<T>::send(T &&msg);
+    T receive();
+    void send(T &&msg);
 
 private:
     std::mutex _mutex;
@@ -51,7 +51,6 @@ class TrafficLight : public TrafficObject
 public:
     // constructor / desctructor
     TrafficLight();
-    ~TrafficLight();
 
     // getters / setters
 
