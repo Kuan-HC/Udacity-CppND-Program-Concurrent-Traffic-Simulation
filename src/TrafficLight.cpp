@@ -53,11 +53,42 @@ void TrafficLight::cycleThroughPhases()
     // and toggles the current phase of the traffic light between red and green and sends an update method 
     // to the message queue using move semantics. The cycle duration should be a random value between 4 and 6 seconds. 
     // Also, the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles. 
-    auto last_update = std::chrono::system_clock::now();
+    std::random_device rd;
+    std::default_random_engine gen = std::default_random_engine(rd());
+    std::uniform_int_distribution<unsigned> cycle_duration(4000, 6000);
+
+    static bool timer_init = false;
+    static bool random_reset = true;
+    static std::chrono::steady_clock::time_point now;
+    static std::chrono::steady_clock::time_point last;
+    static std::chrono::milliseconds time_threshold;
+    
+
     while (true)
     {
-        std::this_thread::sleep_for(std::chrono::microseconds(1));
-       
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        if(random_reset == true)
+        {
+            time_threshold = std::chrono::milliseconds(cycle_duration(gen));
+            random_reset = false;
+        }
+        
+        now = std::chrono::steady_clock::now();
+        if (timer_init == true)
+        {
+            if(std::chrono::duration_cast<std::chrono::milliseconds>(now - last) > time_threshold)
+            {
+                std::cout << "loop take " << std::chrono::duration_cast<std::chrono::milliseconds>(now - last).count() << "ms.\n";
+                std::cout << "toggle" << std::endl;
+                random_reset = true; 
+                last = now;
+            }
+        }
+        else
+        {
+            last = now;
+            timer_init = true;
+        }       
     }
 }
 
