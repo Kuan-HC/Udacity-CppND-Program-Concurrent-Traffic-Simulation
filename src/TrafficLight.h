@@ -6,10 +6,16 @@
 #include <condition_variable>
 #include "TrafficObject.h"
 
-enum TrafficLightPhase{
+typedef enum {
     red,
     green
-}; 
+}TrafficLightPhase; 
+
+typedef enum{
+    Init,
+    Run,
+    Reset
+}timer_state;
 
 // forward declarations to avoid include cycle
 class Vehicle;

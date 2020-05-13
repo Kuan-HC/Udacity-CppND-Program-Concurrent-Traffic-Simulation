@@ -43,7 +43,9 @@ TrafficLightPhase TrafficLight::getCurrentPhase()
 
 void TrafficLight::simulate()
 {
-    // FP.2b : Finally, the private method „cycleThroughPhases“ should be started in a thread when the public method „simulate“ is called. To do this, use the thread queue in the base class. 
+    // FP.2b : Finally, the private method „cycleThroughPhases“ should be started in a thread when the public method „simulate“ is called.
+    // To do this, use the thread queue in the base class. 
+    threads.emplace_back(std::thread(&TrafficLight::cycleThroughPhases, this));
 }
 
 // virtual function which is executed in a thread
@@ -57,38 +59,41 @@ void TrafficLight::cycleThroughPhases()
     std::default_random_engine gen = std::default_random_engine(rd());
     std::uniform_int_distribution<unsigned> cycle_duration(4000, 6000);
 
-    static bool timer_init = false;
-    static bool random_reset = true;
+    
     static std::chrono::steady_clock::time_point now;
     static std::chrono::steady_clock::time_point last;
-    static std::chrono::milliseconds time_threshold;
+    static unsigned int time_threshold;
+    timer_state state = Init; 
     
 
     while (true)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        if(random_reset == true)
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));        
+
+        switch (state)
         {
-            time_threshold = std::chrono::milliseconds(cycle_duration(gen));
-            random_reset = false;
-        }
-        
-        now = std::chrono::steady_clock::now();
-        if (timer_init == true)
-        {
-            if(std::chrono::duration_cast<std::chrono::milliseconds>(now - last) > time_threshold)
+        case Init:
+            /* std::cout << "Init " << std::endl; */ /* for debug */
+            last = std::chrono::steady_clock::now();
+            time_threshold = cycle_duration(gen);
+            state = Run;
+            break;
+        case Run:
+            now = std::chrono::steady_clock::now();
+            if(std::chrono::duration_cast<std::chrono::milliseconds>(now - last).count() > time_threshold)
             {
-                std::cout << "loop take " << std::chrono::duration_cast<std::chrono::milliseconds>(now - last).count() << "ms.\n";
-                std::cout << "toggle" << std::endl;
-                random_reset = true; 
-                last = now;
+                /* std::cout << "loop take " << std::chrono::duration_cast<std::chrono::milliseconds>(now - last).count() << "ms -> toggle" << std::endl; */ /* for debug */
+                _currentPhase = _currentPhase? red:green;
+                state = Reset;
             }
-        }
-        else
-        {
+            break;
+        case Reset:
+            /* std::cout << "Reset " << std::endl; */ /* for debug */
+            time_threshold = cycle_duration(gen);
             last = now;
-            timer_init = true;
-        }       
+            state = Run;
+            break;       
+        }
     }
 }
 
