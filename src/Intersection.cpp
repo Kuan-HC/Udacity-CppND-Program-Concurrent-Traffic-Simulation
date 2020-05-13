@@ -111,6 +111,7 @@ void Intersection::setIsBlocked(bool isBlocked)
 void Intersection::simulate() // using threads + promises/futures + exceptions
 {
     // FP.6a : In Intersection.h, add a private member _trafficLight of type TrafficLight. At this position, start the simulation of _trafficLight.
+    /* Do not use thread here, thread will be used in TrafficLight::simulate() */
     _trafficLight.simulate();
 
     // launch vehicle queue processing in a thread
